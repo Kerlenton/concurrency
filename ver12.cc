@@ -139,14 +139,14 @@ static void Sleep(float num_s, const char* label = "THREAD") {
 static void future_from_async_async() {
     std::future<int> value = std::async(std::launch::async,
                                         [] { Sleep(2.25, "ASYNC"); return 7; });
-    future_test(std::move(value), "async task", __LINE__ - 4, 7);
+    future_test(std::move(value), "async task", __LINE__ - 4, 6);
 }
 
 // Deferred function call (like async, but without threads)
 static void future_from_async_defer() {
     std::future<int> value = std::async(std::launch::deferred,
                                         [] { Sleep(3, "DEFER"); return 11; });
-    future_test(std::move(value), "deferred task", __LINE__ - 4, 7);
+    future_test(std::move(value), "deferred task", __LINE__ - 4, 6);
 }
 
 // Promise: A channel for passing a single message across threads
@@ -154,7 +154,7 @@ static void future_from_async_defer() {
 static void future_from_promise() {
     std::promise<int> p;
     std::thread test_thread( [&] { Sleep(1, "THREAD"); p.set_value(13); } );
-    future_test(p.get_future(), "promise", __LINE__ - 5, 9);
+    future_test(p.get_future(), "promise", __LINE__ - 5, 8);
     test_thread.join();
 }
 
@@ -166,7 +166,7 @@ static void future_from_promise_taketwo() {
         try         { Sleep(0.5, "THREAD"); throw std::runtime_error("Kupo!"); }
         catch (...) { p.set_exception(std::current_exception()); }
     });
-    future_test(p.get_future(), "promise", __LINE__ - 8, 11);
+    future_test(p.get_future(), "promise", __LINE__ - 8, 10);
 }
 
 // Package: Call a function, return value will be received elsewhere
@@ -175,13 +175,13 @@ static int test_func(int num) { Sleep(1, "FUNC"); return num + 57; }
 static void future_from_package() {
     std::packaged_task<int(int)> task{test_func};
     std::thread test_thread( [&] { Sleep(3, "THREAD"), task(42); } );
-    future_test(task.get_future(), "packaged task", __LINE__ - 6, 10);
+    future_test(task.get_future(), "packaged task", __LINE__ - 6, 9);
     test_thread.join();
 }
 
 // A future object must have an associated "state" to be used.
 static void future_from_nothing() {
-    future_test(std::future<int>{}, "nothing", __LINE__ - 2, 5);
+    future_test(std::future<int>{}, "nothing", __LINE__ - 2, 4);
 }
 
 
